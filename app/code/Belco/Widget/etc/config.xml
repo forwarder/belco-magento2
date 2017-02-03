@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Store:etc/config.xsd">
+    <default>
+        <belco_settings>
+            <general>
+                <shop_id/>
+                <api_secret/>
+                <api_url>http://localhost:3500/</api_url>
+            </general>
+        </belco_settings>
+    </default>
+</config>
