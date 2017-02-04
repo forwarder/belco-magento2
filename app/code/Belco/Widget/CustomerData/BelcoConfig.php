@@ -1,12 +1,14 @@
 <?php
-namespace Belco\Widget\Block;
+namespace Belco\Widget\CustomerData;
 
-class Widget extends \Magento\Framework\View\Element\Template
+use Magento\Customer\CustomerData\SectionSourceInterface;
+
+class BelcoConfig implements SectionSourceInterface
 {
     /**
-     * @var \Magento\Framework\App\RequestInterface
+     * @var \Magento\Framework\App\Config\ScopeConfigInterface
      */
-    protected $request = null;
+    protected $scopeConfig;
 
     /**
      * @var \Belco\Widget\Model\BelcoCustomerFactory
@@ -35,27 +37,30 @@ class Widget extends \Magento\Framework\View\Element\Template
 
 
     public function __construct(
-        \Magento\Framework\View\Element\Template\Context $context,
-        \Magento\Framework\App\RequestInterface $request,
+        \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
         \Magento\Customer\Model\Session $customerSession,
         \Magento\Customer\Model\CustomerFactory $customerCustomerFactory,
         \Magento\Checkout\Helper\Cart $checkoutCartHelper,
         \Belco\Widget\Model\BelcoCustomerFactory $widgetBelcoCustomerFactory
     ) {
-      $this->request = $request;
-
-      parent::__construct($context);
-
-      $this->_isScopePrivate = true;
-
+      $this->scopeConfig = $scopeConfig;
       $this->customerSession = $customerSession;
       $this->customerCustomerFactory = $customerCustomerFactory;
       $this->checkoutCartHelper = $checkoutCartHelper;
       $this->belcoCustomer = $widgetBelcoCustomerFactory->create();
     }
 
-    public function getConfig() {
-        $settings = $this->_scopeConfig->getValue('belco_settings/general', \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
+    public function getSectionData() {
+      return $this->getConfig();
+    }
+
+    protected function getConfig() {
+        $settings = $this->scopeConfig->getValue('belco_settings/general', \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
+
+        if ($settings['shop_id'] === NULL) {
+          return NULL;
+        }
+
         $secret = $settings['api_secret'];
 
         $config = array(
@@ -106,8 +111,4 @@ class Widget extends \Magento\Framework\View\Element\Template
         }
     }
 
-    // protected function _toHtml()
-    // {
-    //   return json_encode($this->getConfig());
-    // }
 }

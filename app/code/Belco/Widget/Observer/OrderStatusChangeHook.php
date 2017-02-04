@@ -38,15 +38,15 @@ class OrderStatusChangeHook implements ObserverInterface
      */
     public function execute(\Magento\Framework\Event\Observer $observer)
     {
-        $order = $observer->getEvent()->getOrder();
-        $status = $order->getStatus();
+        // $order = $observer->getEvent()->getOrder();
+        // $status = $order->getStatus();
 
-        if (is_string($status)) { //only fire when we actually have an status
-          try{
-            $this->api->syncOrder($order);
-          } catch(Exception $e) {
-            $this->helper->log("Exception: ". $e->getMessage());
-          }
-        }
+        // if (is_string($status)) { //only fire when we actually have an status
+        //   try{
+        //     $this->api->syncOrder($order);
+        //   } catch(Exception $e) {
+        //     $this->helper->log("Exception: ". $e->getMessage());
+        //   }
+        // }
     }
 }

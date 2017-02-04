@@ -49,6 +49,8 @@ class BelcoCustomer {
       'id' => $this->customer->getId(),
       'email' => $this->customer->getEmail(),
       'name' => $this->customer->getName(),
+      'firstName' => $this->customer->getFirstname(),
+      'lastName' => $this->customer->getLastname(),
       'signedUp' => strtotime($this->customer->getCreatedAt()),
       'orders' => $lifetime->getNumOrders(),
       'totalSpent' => $lifetime->getLifetime()
@@ -89,7 +91,7 @@ class BelcoCustomer {
    */
   function getLifeTimeSalesCustomer() {
     return $this->salesResourceModelSaleCollectionFactory->create()
-      ->setOrderStateFilter(null)
+      // ->setOrderStateFilter(null)
       ->addFieldToFilter('customer_id', $this->customer->getId())
       ->load()
       ->getTotals();

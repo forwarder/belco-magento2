@@ -1,8 +1,6 @@
 <?php
 namespace Belco\Widget\Model;
 
-
-
 /**
  * Class Belco_Widget_Model_BelcoOrder
  */
@@ -20,16 +18,23 @@ class BelcoOrder
     protected $backendHelper;
 
     /**
-     * @var \Magento\Sales\Model\Order\ShipmentFactory
+     * @var \Magento\Sales\Model\CustomerFactory
      */
-    protected $salesOrderShipmentFactory;
+    protected $customerCustomerFactory;
+
+    /**
+     * @var \Belco\Widget\Model\BelcoCustomer
+     */
+    protected $belcoCustomer;
 
     public function __construct(
         \Magento\Backend\Helper\Data $backendHelper,
-        // \Magento\Sales\Model\Order\ShipmentFactory $salesOrderShipmentFactory
+        \Magento\Customer\Model\CustomerFactory $customerCustomerFactory,
+        \Belco\Widget\Model\BelcoCustomerFactory $widgetBelcoCustomerFactory
     ) {
         $this->backendHelper = $backendHelper;
-        // $this->salesOrderShipmentFactory = $salesOrderShipmentFactory;
+        $this->customerCustomerFactory = $customerCustomerFactory;
+        $this->belcoCustomer = $widgetBelcoCustomerFactory->create();
     }
     /**
    * Factory method for creating an array with data that is
@@ -39,10 +44,8 @@ class BelcoOrder
    * @return array
    */
   public function factory(\Magento\Sales\Model\Order $order)
-  
+  {
     $this->order = $order;
-
-    // $this->shipments = $this->order->getShipmentsCollection();
     return $this->make();
   }
 
@@ -55,11 +58,6 @@ class BelcoOrder
   private function make()
   {
     $order = $this->getOrder();
-    // $order['products'] = $this->getProducts();
-    // $order['payment'] = $this->getPayment();
-    // $order['shipping'] = $this->getShipping();
-    // $order['shipments'] = $this->getShipments();
-    // $order['invoices'] = $this->getInvoices();
     $order['customer'] = $this->getCustomer();
 
     return $order;
@@ -90,104 +88,31 @@ class BelcoOrder
    * for the Belco API.
    * @return array
    */
-  private function getCustomer() {
-    $address = $this->order->getBillingAddress();
-    $customer = array(
-      'id' => $this->order->getCustomerId(),
-      'name' => $this->order->getCustomerName(),
-      'email' => $this->order->getCustomerEmail(),
-      'phoneNumber' => $address->getTelephone(),
-      'city' => $address->getCity(),
-      'country' => $address->getCountry(),
-      'lastOrder' => strtotime($this->order->getCreatedAt()),
-      'lastVisit' => time(),
-      'ipAddress' => $this->order->getRemoteIp()
-    );
-    return $customer;
-  }
-
-  /**
-   * Gets the Details view as first item of the 'details_view' key
-   * @return array
-   */
-  private function getPayment()
+  private function getCustomer()
   {
-    $payment = $this->order->getPayment()->getMethodInstance();
-    $status = $payment->getStatus();
-    return array(
-      'method' => $payment->getTitle(),
-      'status' => ($status === null) ? 'open' : $status
-    );
-  }
+    $customerId = $this->order->getCustomerId();
 
-  private function getShipping()
-  {
-    return array(
-      'method' => $this->order->getShippingDescription(),
-      'total' => $this->order->getBaseShippingAmount()
-    );
-  }
-
-  /**
-   * When there are shipments, it lists them and their status.
-   * Otherwise the 'data' key stays empty.
-   * @return array
-   */
-  private function getShipments()
-  {
-    $shipments = array();
-    $orderStatus = $this->order->getState();
-    if ($this->shipments !== false) {
-      foreach ($this->shipments as $shipment) {
-        $shipments[] = array(
-          'id' => $shipment->getIncrementId(),
-          'name' => $shipment->getTitle(),
-          'url' => $this->getShipmentUrl($shipment),
-          'status' => ($orderStatus === \Magento\Sales\Model\Order::STATE_COMPLETE) ? 'shipped' : 'processing'
-        );
-      }
-    }
-
-    return $shipments;
-  }
-
-  /**
-   * When there are invoices it lists them with a link, status and the price.
-   *
-   * @return array
-   */
-  private function getInvoices()
-  {
-    $invoices = array();
-    if ($this->order->hasInvoices()) {
-      foreach ($this->order->getInvoiceCollection() as $invoice) {
-        $invoices[] = array(
-          'id' => $invoice->getIncrementId(),
-          'url' => $this->getInvoiceAdminUrl($invoice),
-          'status' => $this->getInvoiceStatus($invoice),
-          'total' => $invoice->getBaseGrandTotal()
-        );
-      }
-    }
-
-    return $invoices;
-  }
-
-  /**
-   * @return array
-   */
-  private function getProducts()
-  {
-    $products = array();
-    $items = $this->order->getAllItems();
-    foreach ($items as $item) {
-      $products[] = array(
-        'name' => $item->getName(),
-        'quantity' => (int)$item->getQtyOrdered(),
-        'price' => $item->getPrice()
+    if ($customerId === NULL) {
+      $address = $this->order->getBillingAddress();
+      $customer = array(
+        'name' => $address->getName(),
+        'firstName' => $address->getFirstname(),
+        'lastName' => $address->getLastname(),
+        'email' => $this->order->getCustomerEmail(),
+        'phoneNumber' => $address->getTelephone(),
+        'city' => $address->getCity(),
+        'country' => $address->getCountry(),
+        'lastOrder' => strtotime($this->order->getCreatedAt()),
+        'lastVisit' => time(),
+        'ipAddress' => $this->order->getRemoteIp()
+      );
+    } else {
+      $customer = $this->belcoCustomer->factory(
+        $this->customerCustomerFactory->create()->load($customerId)
       );
     }
-    return $products;
+
+    return $customer;
   }
 
   /**
@@ -197,59 +122,7 @@ class BelcoOrder
   {
     return $this->backendHelper->getUrl(
       'adminhtml/sales_order/view',
-      array('order_id' => $this->order->getId(), '_type' => \Magento\Store\Model\Store::URL_TYPE_WEB)
+      array('order_id' => $this->order->getId())
     );
-  }
-
-  /**
-   * @param $shipment
-   * @return mixed
-   */
-  private function getShipmentUrl($shipment)
-  {
-    $shipmentId = $this->salesOrderShipmentFactory->create()
-      ->loadByIncrementId($shipment->getIncrementId())
-      ->getId();
-
-    return $this->backendHelper
-      ->getUrl(
-        'adminhtml/sales_shipment/view',
-        array('shipment_id' => $shipmentId, '_type' => \Magento\Store\Model\Store::URL_TYPE_WEB)
-    );
-  }
-
-  /**
-   * @param $invoice
-   * @return string
-   */
-  private function getInvoiceStatus($invoice)
-  {
-    $stateCode = $invoice->getState();
-    switch ($stateCode) {
-      case \Magento\Sales\Model\Order\Invoice::STATE_CANCELED:
-        $state = 'canceled';
-        break;
-      case \Magento\Sales\Model\Order\Invoice::STATE_PAID:
-        $state = 'paid';
-        break;
-      default:
-        $state = 'open';
-        break;
-    }
-    return $state;
-  }
-
-
-  /**
-   * @param $invoice
-   * @return string
-   */
-  private function getInvoiceAdminUrl($invoice)
-  {
-    return $this->backendHelper
-      ->getUrl(
-        'adminhtml/sales_invoice/view',
-        array('invoice_id' => $invoice->getId(), '_type' => \Magento\Store\Model\Store::URL_TYPE_WEB)
-      );
   }
 }

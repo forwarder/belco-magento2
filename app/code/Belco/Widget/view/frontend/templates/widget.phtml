@@ -1,9 +1,3 @@
-<?php
-$config = $block->getConfig();
-if (isset($config['shopId'])) :
-?>
-<script>
-window.belcoConfig = <?php echo json_encode($config); ?>;
+<script type="text/x-magento-init">
+{"*": {"Magento_Ui/js/core/app": <?php /* @escapeNotVerified */ echo $block->getJsLayout();?>}}
 </script>
-<script>(function(e,t){var n=e.createElement(t);n.async=true;n.src="//cdn.belco.dev/widget.js";n.onload=n.onreadystatechange=function(){var e=this.readyState;if(e)if(e!="complete")if(e!="loaded")return;try{Belco("init",belcoConfig)}catch(t){}};var r=e.getElementsByTagName(t)[0];r.parentNode.insertBefore(n,r)})(document,"script")</script>
-<?php endif; ?>
