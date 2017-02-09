@@ -5,7 +5,7 @@
             <general>
                 <shop_id/>
                 <api_secret/>
-                <api_url>http://localhost:3500/</api_url>
+                <api_url>https://api.belco.io/</api_url>
             </general>
         </belco_settings>
     </default>
