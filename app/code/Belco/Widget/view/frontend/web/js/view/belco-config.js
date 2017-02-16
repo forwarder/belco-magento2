@@ -7,7 +7,7 @@ define([
   function loadWidget(callback) {
     var s = document.createElement('script');
     s.async = true;
-    s.src = 'http://cdn.belco.io/widget.min.js';
+    s.src = 'https://cdn.belco.io/widget.min.js';
     s.onload = s.onreadystatechange = function() {
       var rs = this.readyState;
       if (rs) 
