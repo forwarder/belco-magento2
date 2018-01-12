@@ -29,9 +29,9 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     protected $customerResourceModelCustomerCollectionFactory;
 
     /**
-     * @var \Magento\Backend\Model\Session
+     * @var \Magento\Framework\Message\ManagerInterface
      */
-    protected $backendSession;
+    protected $messageManager;
 
     /**
      * Gets and sets the dependency's
@@ -41,12 +41,12 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
           \Belco\Widget\Model\ApiFactory $widgetApiFactory,
           \Magento\Sales\Model\ResourceModel\Order\CollectionFactory $salesResourceModelOrderCollectionFactory,
           \Magento\Customer\Model\ResourceModel\Customer\CollectionFactory $customerResourceModelCustomerCollectionFactory,
-          \Magento\Backend\Model\Session $backendSession
+          \Magento\Framework\Message\ManagerInterface $messageManager
       ){
         $this->widgetApiFactory = $widgetApiFactory;
         $this->salesResourceModelOrderCollectionFactory = $salesResourceModelOrderCollectionFactory;
         $this->customerResourceModelCustomerCollectionFactory = $customerResourceModelCustomerCollectionFactory;
-        $this->backendSession = $backendSession;
+        $this->messageManager = $messageManager;
         parent::__construct(
             $context
         );
@@ -76,14 +76,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
       
     public function connectShop()
     {
-        $result = $this->api->connect();
-    }
-
-    /**
-     * @param $message
-     */
-    public function log($message){
-        $this->logger->log(null, $message);
+        return $this->api->connect();
     }
 
     /**
@@ -100,16 +93,11 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         return $this->logger;
     }
 
-    public static function warnAdmin($warning){
-        $this->backendSession->addWarning("Belco: " . $warning);
+    public function warnAdmin($warning){
+        $this->messageManager->addWarning("Belco: " . $warning);
     }
 
-    public static function noticeAdmin($notice){
-        $this->backendSession->addSuccess("Belco: " . $notice);
-    }
-
-    public static function formatPrice($price){
-        return Mage::helper('core')->currency($price, true, false);
+    public function noticeAdmin($notice){
+        $this->messageManager->addSuccess("Belco: " . $notice);
     }
 }
-   

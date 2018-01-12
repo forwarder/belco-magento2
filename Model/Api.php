@@ -132,9 +132,8 @@ class Api
     $data = json_encode($data);
 
     if (empty($config['api_secret'])) {
-      throw new \Exception(
-        'Missing API configuration, go to System -> Configuration -> Belco.io -> Settings and fill in your API credentials'
-      );
+      $this->logger->log(\Psr\Log\LogLevel::INFO, 'Missing API configuration, go to System -> Configuration -> Belco.io -> Settings and fill in your API credentials');
+      return false;
     }
 
     $url = $config['api_url'] . $path;
@@ -153,28 +152,24 @@ class Api
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
     curl_setopt($ch, CURLOPT_CAINFO, dirname(dirname(__FILE__)) . '/etc/cabundle.crt');
 
-    $response = curl_exec($ch);
+    curl_exec($ch);
 
     if (curl_errno($ch)) {
-      $this->logger->log(\Psr\Log\LogLevel::ERROR, "Curl error: " . curl_error($ch));
-    }
-
-    if ($response === false) {
+      $this->logger->log(\Psr\Log\LogLevel::ERROR, "Belco curl error: " . curl_error($ch));
       curl_close($ch);
-      throw new \Exception("Error: 'Request to Belco failed'");
+      return false;
     }
-
-    $response = json_decode($response);
 
     $responseInfo = curl_getinfo($ch);
 
-    curl_close($ch);
-
     if (in_array($responseInfo['http_code'], $errorCodes)) {
-      throw new \Exception("Error: '" . $response->message . "'");
+      $this->logger->log(\Psr\Log\LogLevel::ERROR, "Belco request failed with code " . $responseInfo['http_code'] . "");
+      curl_close($ch);
+      return false;
     }
 
-    return $response;
-  }
+    curl_close($ch);
 
+    return true;
+  }
 }

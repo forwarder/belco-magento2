@@ -38,13 +38,11 @@ class OrderPlacedHook implements ObserverInterface
      */
     public function execute(\Magento\Framework\Event\Observer $observer)
     {
-        $order = $observer->getEvent()->getOrder();
-        if ($order) {
-            try {
+        try {
+            $order = $observer->getEvent()->getOrder();
+            if ($order) {
                 $this->api->syncOrder($order);
-            } catch(Exception $e) {
-                $this->helper->log("Exception: ". $e->getMessage());
             }
-        }
+        } catch(Exception $e) {}
     }
 }

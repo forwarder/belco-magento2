@@ -38,14 +38,12 @@ class CustomerHook implements ObserverInterface
      */
     public function execute(\Magento\Framework\Event\Observer $observer)
     {
-        $customer = $observer->getEvent()->getCustomer();
+        try {
+            $customer = $observer->getEvent()->getCustomer();
 
-        if ($customer) {
-            try {
+            if ($customer) {
                 $this->api->syncCustomer($customer);
-            } catch (Exception $e) {
-                $this->helper->log("Exception: " . $e->getMessage());
             }
-        }
+        } catch (Exception $e) {}
     }
 }

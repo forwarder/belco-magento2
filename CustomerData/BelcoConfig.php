@@ -57,8 +57,8 @@ class BelcoConfig implements SectionSourceInterface
     protected function getConfig() {
         $settings = $this->scopeConfig->getValue('belco_settings/general', \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
 
-        if ($settings['shop_id'] === NULL) {
-          return NULL;
+        if (empty($settings['shop_id'])) {
+          return array();
         }
 
         $secret = $settings['api_secret'];
