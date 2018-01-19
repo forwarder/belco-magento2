@@ -5,7 +5,7 @@
 ## Installation
 
 ```bash
-composer require forwarder/belco-magento2:0.1.0
+composer require forwarder/belco-magento2
 php bin/magento setup:upgrade
 php bin/magento setup:di:compile
 ```
