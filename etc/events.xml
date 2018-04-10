@@ -1,7 +1,10 @@
 <?xml version="1.0"?>
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Event/etc/events.xsd">
     <event name="customer_save_after">
-        <observer name="customer_save_after_handler" instance="Belco\Widget\Observer\CustomerHook"/>
+        <observer name="customer_save_after_handler" instance="Belco\Widget\Observer\CustomerSaveHook"/>
+    </event>
+    <event name="customer_delete_after">
+        <observer name="customer_delete_after_handler" instance="Belco\Widget\Observer\CustomerDeleteHook"/>
     </event>
     <event name="sales_order_place_after">
         <observer name="sales_order_place_after_handler" instance="Belco\Widget\Observer\OrderPlacedHook"/>

@@ -81,6 +81,17 @@ class Api
   }
 
   /**
+   * Delete a customer in Beco
+   *
+   * @param $customer
+   * @return mixed
+   */
+  public function deleteCustomer($id)
+  {
+    return $this->post('sync/customer/delete', array('id' => $id));
+  }
+
+  /**
    * Synchronizes order data to Belco
    *
    * @param $order

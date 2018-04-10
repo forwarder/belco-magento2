@@ -3,7 +3,7 @@ namespace Belco\Widget\Observer;
  
 use Magento\Framework\Event\ObserverInterface;
  
-class CustomerHook implements ObserverInterface
+class CustomerSaveHook implements ObserverInterface
 {
     /**
      * @var ObjectManagerInterface
