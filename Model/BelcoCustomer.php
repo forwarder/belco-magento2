@@ -81,6 +81,7 @@ class BelcoCustomer {
       ->addFieldToSelect('customer_id')
       ->addFieldToFilter('customer_id', $this->customer->getId())
       ->addAttributeToSort('created_at', 'DESC')
+      ->setPage(1,1)
       ->getFirstItem();
   }
 
