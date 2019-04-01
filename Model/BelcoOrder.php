@@ -101,7 +101,7 @@ class BelcoOrder
         'email' => $this->order->getCustomerEmail(),
         'phoneNumber' => $address->getTelephone(),
         'city' => $address->getCity(),
-        'country' => $address->getCountry(),
+        'country' => $address->getCountryId(),
         'lastOrder' => strtotime($this->order->getCreatedAt()),
         'lastVisit' => time(),
         'ipAddress' => $this->order->getRemoteIp()
