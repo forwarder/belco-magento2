@@ -204,14 +204,6 @@ class Api
 
     curl_exec($ch);
 
-    $this->debug($url);
-    $this->debug($data);
-    $this->debug($config['shop_id']);
-    $this->debug($config['api_secret']);
-    $this->debug($signature);
-
-    $this->debug(hash_hmac('sha256', '123', $config['api_secret']));
-
     if (curl_errno($ch)) {
       $this->logError("Curl error: " . curl_error($ch));
       curl_close($ch);
