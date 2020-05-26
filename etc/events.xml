@@ -6,8 +6,8 @@
     <event name="customer_delete_after">
         <observer name="customer_delete_after_handler" instance="Belco\Widget\Observer\CustomerDeleteHook"/>
     </event>
-    <event name="sales_order_place_after">
-        <observer name="sales_order_place_after_handler" instance="Belco\Widget\Observer\OrderPlacedHook"/>
+    <event name="sales_order_save_after">
+        <observer name="checkout_submit_all_after_handler" instance="Belco\Widget\Observer\OrderPlacedHook"/>
     </event>
     <event name="admin_system_config_changed_section_belco_settings">
         <observer name="widget" instance="Belco\Widget\Observer\SystemConfigChangedHook"/>

@@ -81,7 +81,7 @@ class Api
   }
 
   /**
-   * Delete a customer in Beco
+   * Delete a customer in Belco
    *
    * @param $customer
    * @return mixed
@@ -92,15 +92,39 @@ class Api
   }
 
   /**
-   * Synchronizes order data to Belco
+   * Sync order data to Belco
    *
    * @param $order
    * @return mixed
    */
-  public function syncOrder($order)
+  public function trackOrder($order) {
+    $data = $this->toBelcoOrder($order);
+    $identity = $data['customer'];
+    unset($data['customer']);
+
+    $event = 'Order Completed';
+    if ($data['status'] === 'cancelled') {
+        $event = 'Order Cancelled';
+    }
+
+    return $this->trackEvent(array(
+        'type' => 'track',
+        'event' => $event,
+        'identity' => $identity,
+        'sentAt' => $data['date'],
+        'properties' => $data
+    ));
+  }
+
+  /**
+   * Track an event in Belco
+   *
+   * @param $event
+   * @return mixed
+   */
+  public function trackEvent($event)
   {
-    $order = $this->toBelcoOrder($order);
-    return $this->post('sync/customer', $order['customer']);
+    return $this->post('v1/t', $event);
   }
 
   /**
@@ -110,7 +134,7 @@ class Api
    * @param \Magento\Customer\Model\Customer $customer
    * @return array
    */
-  private function toBelcoCustomer(\Magento\Customer\Model\Customer $customer)
+  public function toBelcoCustomer(\Magento\Customer\Model\Customer $customer)
   {
     return $this->belcoCustomer->factory($customer);
   }
@@ -123,9 +147,21 @@ class Api
    * @param \Magento\Sales\Model\Order $order
    * @return array
    */
-  private function toBelcoOrder(\Magento\Sales\Model\Order $order)
+  public function toBelcoOrder(\Magento\Sales\Model\Order $order)
   {
     return $this->belcoOrder->factory($order);
+  }
+
+  public function log($message){
+    return $this->logger->log(\Psr\Log\LogLevel::INFO, "Belco: " . $message);
+  }
+
+  public function debug($message){
+      return $this->logger->log(\Psr\Log\LogLevel::DEBUG, "Belco: " . $message);
+  }
+
+  public function logError($message){
+      return $this->logger->log(\Psr\Log\LogLevel::ERROR, "Belco: " . $message);
   }
 
   /**
@@ -143,21 +179,24 @@ class Api
     $data = json_encode($data);
 
     if (empty($config['api_secret'])) {
-      $this->logger->log(\Psr\Log\LogLevel::INFO, 'Missing API configuration, go to System -> Configuration -> Belco.io -> Settings and fill in your API credentials');
+      $this->log('Missing API configuration, go to System -> Configuration -> Belco.io -> Settings and fill in your API credentials');
       return false;
     }
 
     $url = $config['api_url'] . $path;
 
+    $signature = hash_hmac('sha256', $data, $config['api_secret']);
+
     $ch = curl_init($url);
-    curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 2);
-    curl_setopt($ch, CURLOPT_TIMEOUT, 5);
+    curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 20);
+    curl_setopt($ch, CURLOPT_TIMEOUT, 50);
     curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
     curl_setopt($ch, CURLOPT_URL, $url);
     curl_setopt($ch, CURLOPT_HTTPHEADER, array(
       'Content-Type: application/json',
       'Content-Length: ' . strlen($data),
-      'X-Api-Key: ' . $config['api_secret']
+      'X-Signature: ' . $signature,
+      'X-Shop-Id: ' . $config['shop_id']
     ));
     curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
@@ -165,8 +204,16 @@ class Api
 
     curl_exec($ch);
 
+    $this->debug($url);
+    $this->debug($data);
+    $this->debug($config['shop_id']);
+    $this->debug($config['api_secret']);
+    $this->debug($signature);
+
+    $this->debug(hash_hmac('sha256', '123', $config['api_secret']));
+
     if (curl_errno($ch)) {
-      $this->logger->log(\Psr\Log\LogLevel::ERROR, "Belco curl error: " . curl_error($ch));
+      $this->logError("Curl error: " . curl_error($ch));
       curl_close($ch);
       return false;
     }
@@ -174,7 +221,7 @@ class Api
     $responseInfo = curl_getinfo($ch);
 
     if (in_array($responseInfo['http_code'], $errorCodes)) {
-      $this->logger->log(\Psr\Log\LogLevel::ERROR, "Belco request failed with code " . $responseInfo['http_code'] . "");
+      $this->logError("Request failed with code " . $responseInfo['http_code'] . "");
       curl_close($ch);
       return false;
     }

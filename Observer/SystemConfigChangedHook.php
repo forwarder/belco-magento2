@@ -41,7 +41,7 @@ class SystemConfigChangedHook implements ObserverInterface
       try {
         $this->helper->connectShop();
       } catch (Exception $e) {
-        $this->helper->log("Exception: " . $e->getMessage());
+        $this->api->logError("Exception: " . $e->getMessage());
         $this->helper->warnAdmin($e->getMessage());
       }
     }

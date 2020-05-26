@@ -53,26 +53,6 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
 
         $this->api = $this->widgetApiFactory->create();
     }
-
-    /**
-     * Sends all orders to the Belco API.
-     */
-    public function sendOrders(){
-        $collection = $this->salesResourceModelOrderCollectionFactory->create();
-        $this->api->syncOrders($collection);
-    }
-
-    /**
-     * Sends all customers to the Belco API.
-     */
-    public function sendCustomers(){
-        $collection = $this->customerResourceModelCustomerCollectionFactory->create()
-          ->addNameToSelect()
-          ->addAttributeToSelect('email')
-          ->addAttributeToSelect('created_at');
-
-        $this->api->syncCustomers($collection);
-    }
       
     public function connectShop()
     {
@@ -91,6 +71,18 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      */
     public function getLogger(){
         return $this->logger;
+    }
+
+    public function log($message){
+        return $this->logger->log(\Psr\Log\LogLevel::INFO, "Belco: " . $message);
+    }
+
+    public function debug($message){
+        return $this->logger->log(\Psr\Log\LogLevel::DEBUG, "Belco: " . $message);
+    }
+
+    public function logError($message){
+        return $this->logger->log(\Psr\Log\LogLevel::ERROR, "Belco: " . $message);
     }
 
     public function warnAdmin($warning){

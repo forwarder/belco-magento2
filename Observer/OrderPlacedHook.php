@@ -41,8 +41,10 @@ class OrderPlacedHook implements ObserverInterface
         try {
             $order = $observer->getEvent()->getOrder();
             if ($order) {
-                $this->api->syncOrder($order);
+                $this->api->trackOrder($order);
             }
-        } catch(Exception $e) {}
+        } catch(Exception $e) {
+            $this->api->logError($e->getMessage());
+        }
     }
 }
