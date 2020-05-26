@@ -73,8 +73,7 @@ class BelcoOrder
     $date = strtotime($this->order->getCreatedAt());
     $currency = $this->order->getBaseCurrency();
     return array(
-      'id' => $this->order->getIncrementId(),
-      'number' => $this->order->getIncrementId(),
+      'orderId' => $this->order->getIncrementId(),
       'url' => $this->getOrderAdminUrl(),
       'date' => $date,
       'status' => $this->order->getStatus(),
