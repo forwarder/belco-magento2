@@ -11,10 +11,10 @@ define([
 
   function initBelco(config) {
     if (config && config.shopId) {
-      Belco('init', _.omit(config, 'data_id'));
+      Belco.init(_.omit(config, 'data_id'));
       Belco.once('ready', function() {
-          document.dispatchEvent(new Event('Belco_Ready'));
-      })
+        document.dispatchEvent(new Event('BelcoReady'));
+      });
     }
   }
 
