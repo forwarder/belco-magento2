@@ -200,7 +200,6 @@ class Api
     ));
     curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    curl_setopt($ch, CURLOPT_CAINFO, dirname(dirname(__FILE__)) . '/etc/cabundle.crt');
 
     curl_exec($ch);
 
