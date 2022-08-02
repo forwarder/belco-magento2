@@ -22,3 +22,13 @@ or add this to your composer.json file manually
         }
     ]
 ```
+
+## Configuration
+After installing do the following procedure:
+1. Go to the admin panel
+2. Navigate to Stores >  Configuration.
+3. Navigate to Belco > Settings.
+4. Fill in the `Shop id` and `API Secret` and save.
+
+`Shop id` and `API Secret` can be found within the belco app.
+Under: Settings > API keys

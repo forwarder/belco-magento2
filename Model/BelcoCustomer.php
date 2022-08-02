@@ -57,7 +57,7 @@ class BelcoCustomer {
     );
 
     if ($lastOrder = $this->getLastOrder()) {
-      if ($lastOrderDate = strtotime($lastOrder->getCreatedAt())) {
+      if ($lastOrder->getCreatedAt() !== null && $lastOrderDate = strtotime($lastOrder->getCreatedAt())) {
         $belcoCustomer['lastOrder'] = $lastOrderDate;
       }
     }
