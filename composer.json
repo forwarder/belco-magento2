@@ -12,7 +12,12 @@
         {
             "name":"Eelco",
             "email":"eelco@belco.io",
-            "homepage": "http://www.belco.io"
+            "homepage": "https://www.belco.io"
+        },
+        {
+            "name": "Michaël",
+            "email": "michael@belco.io",
+            "homepage": "https://www.belco.io"
         }
     ],
     "autoload": {
