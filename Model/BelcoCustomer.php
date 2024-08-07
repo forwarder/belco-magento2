@@ -51,13 +51,13 @@ class BelcoCustomer {
       'name' => $this->customer->getName(),
       'firstName' => $this->customer->getFirstname(),
       'lastName' => $this->customer->getLastname(),
-      'signedUp' => strtotime($this->customer->getCreatedAt()),
+      'signedUp' => strtotime($this->customer->getCreatedAt() ?? ''),
       'orders' => $lifetime->getNumOrders(),
       'totalSpent' => $lifetime->getLifetime()
     );
 
     if ($lastOrder = $this->getLastOrder()) {
-      if ($lastOrder->getCreatedAt() !== null && $lastOrderDate = strtotime($lastOrder->getCreatedAt())) {
+      if ($lastOrder->getCreatedAt() !== null && $lastOrderDate = strtotime($lastOrder->getCreatedAt() ?? '')) {
         $belcoCustomer['lastOrder'] = $lastOrderDate;
       }
     }
@@ -75,7 +75,7 @@ class BelcoCustomer {
         $belcoCustomer['company'] = array(
           'id' => $this->customer->getId(),
           'name' => $address->getCompany(),
-          'signedUp' => strtotime($this->customer->getCreatedAt())
+          'signedUp' => strtotime($this->customer->getCreatedAt() ?? '')
         );
       }
     }
