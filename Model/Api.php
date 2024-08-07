@@ -38,7 +38,12 @@ class Api
      * @var \Magento\Framework\App\Config\ScopeConfigInterface
      */
     protected $scopeConfig;
-
+    
+    /**
+     * @var \Magento\Store\Model\StoreManagerInterface 
+     */ 
+    protected $storeManager;
+    
     /**
    * Gets and sets the dependency's
    */
