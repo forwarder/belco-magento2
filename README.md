@@ -32,3 +32,12 @@ After installing do the following procedure:
 
 `Shop id` and `API Secret` can be found within the belco app.
 Under: Settings > API keys
+
+## Hyvä Compatible
+When you have a Hyvä license, you can install the Hyvä compatible module.
+
+```bash
+composer require falconmedia/magento2-belco-hyva
+php bin/magento module:enable Belco_Widget Belco_Hyva
+php bin/magento setup:upgrade
+```
