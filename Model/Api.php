@@ -210,7 +210,7 @@ class Api
 
     if (curl_errno($ch)) {
       $this->logError("Curl error: " . curl_error($ch));
-      curl_close($ch);
+      unset($ch);
       return false;
     }
 
@@ -218,11 +218,11 @@ class Api
 
     if (in_array($responseInfo['http_code'], $errorCodes)) {
       $this->logError("Request failed with code " . $responseInfo['http_code'] . "");
-      curl_close($ch);
+      unset($ch);
       return false;
     }
 
-    curl_close($ch);
+    unset($ch);
 
     return true;
   }
