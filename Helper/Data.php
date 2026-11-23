@@ -70,19 +70,19 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      * @return \Psr\Log\LoggerInterface
      */
     public function getLogger(){
-        return $this->logger;
+        return $this->_logger;
     }
 
     public function log($message){
-        return $this->logger->log(\Psr\Log\LogLevel::INFO, "Belco: " . $message);
+        return $this->_logger->log(\Psr\Log\LogLevel::INFO, "Belco: " . $message);
     }
 
     public function debug($message){
-        return $this->logger->log(\Psr\Log\LogLevel::DEBUG, "Belco: " . $message);
+        return $this->_logger->log(\Psr\Log\LogLevel::DEBUG, "Belco: " . $message);
     }
 
     public function logError($message){
-        return $this->logger->log(\Psr\Log\LogLevel::ERROR, "Belco: " . $message);
+        return $this->_logger->log(\Psr\Log\LogLevel::ERROR, "Belco: " . $message);
     }
 
     public function warnAdmin($warning){

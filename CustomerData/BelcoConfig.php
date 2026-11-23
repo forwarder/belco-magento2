@@ -2,6 +2,7 @@
 namespace Belco\Widget\CustomerData;
 
 use Magento\Customer\CustomerData\SectionSourceInterface;
+use Magento\Customer\Model\ResourceModel\Customer as CustomerResource;
 
 class BelcoConfig implements SectionSourceInterface
 {
@@ -36,13 +37,20 @@ class BelcoConfig implements SectionSourceInterface
     protected $belcoCustomer;
 
 
+    /**
+     * @var CustomerResource
+     */
+    protected $customerResource;
+
     public function __construct(
         \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
         \Magento\Customer\Model\Session $customerSession,
         \Magento\Customer\Model\CustomerFactory $customerCustomerFactory,
         \Magento\Checkout\Helper\Cart $checkoutCartHelper,
-        \Belco\Widget\Model\BelcoCustomerFactory $widgetBelcoCustomerFactory
+        \Belco\Widget\Model\BelcoCustomerFactory $widgetBelcoCustomerFactory,
+        CustomerResource $customerResource
     ) {
+      $this->customerResource = $customerResource;
       $this->scopeConfig = $scopeConfig;
       $this->customerSession = $customerSession;
       $this->customerCustomerFactory = $customerCustomerFactory;
@@ -68,7 +76,8 @@ class BelcoConfig implements SectionSourceInterface
         );
 
         if ($this->customerSession->isLoggedIn()) {
-          $customer = $this->customerCustomerFactory->create()->load($this->customerSession->getCustomer()->getId());
+          $customer = $this->customerCustomerFactory->create();
+          $this->customerResource->load($customer, $this->customerSession->getCustomer()->getId());
 
           if ($secret) {
             $config['hash'] = hash_hmac("sha256", $customer->getId(), $secret);
