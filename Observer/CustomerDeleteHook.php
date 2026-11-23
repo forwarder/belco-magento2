@@ -1,6 +1,7 @@
 <?php
 namespace Belco\Widget\Observer;
  
+use Exception;
 use Magento\Framework\Event\ObserverInterface;
  
 class CustomerDeleteHook implements ObserverInterface
